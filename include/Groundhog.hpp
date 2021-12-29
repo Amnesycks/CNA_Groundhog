@@ -21,19 +21,19 @@ class Groundhog {
         ~Groundhog();
         void core(int period);
         void calculateTemperatureIncreaseAverage(unsigned int period);
-        void calculateRelativeTempatureEvolution(unsigned int period);
+        void calculateRelativeTemperatureEvolution(unsigned int period);
         void calculateWeirdest(void);
-        void calculateStandarDeviation(int period);
+        void calculateStandardDeviation(int period);
         void display(unsigned int period);
     protected:
     private:
         char _input[100];
         std::vector<double> _vec;
         std::vector<double> _weirdValues;
-        double _g;
-        int _lastr;
-        int _r;
-        double _s;
+        double _tempIncreaseAverage;
+        int _relativeTempEvolution;
+        int _lastRelativeTempEvolution;
+        double _standardDeviation;
         int _switches;
         bool _isIncrease;
 };

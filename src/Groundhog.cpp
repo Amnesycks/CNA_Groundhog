@@ -10,11 +10,11 @@
 Groundhog::Groundhog()
 {
     _switches = 0;
-    _g = 0;
-    _lastr = 0;
+    _tempIncreaseAverage = 0;
+    _relativeTempEvolution = 0;
+    _lastRelativeTempEvolution = 0;
     _isIncrease = false;
-    _r = 0;
-    _s = 0;
+    _standardDeviation = 0;
 }
 
 Groundhog::~Groundhog()
@@ -27,29 +27,29 @@ void Groundhog::calculateTemperatureIncreaseAverage(unsigned int period)
 
     if (_vec.size() <= period)
         return;
-    _g = 0;
+    _tempIncreaseAverage = 0;
     for (size_t i = _vec.size() - period; i != _vec.size(); i++) {
         tmp = _vec[i] - _vec[i - 1];
         if (tmp > 0)
-            _g += tmp;
+            _tempIncreaseAverage += tmp;
     }
-    _g /= period;
+    _tempIncreaseAverage /= period;
 }
 
-void Groundhog::calculateRelativeTempatureEvolution(unsigned int period)
+void Groundhog::calculateRelativeTemperatureEvolution(unsigned int period)
 {
     double val1 = 0;
     double val2 = 0;
 
     if (_vec.size() <= period)
         return;
-    _lastr = _r;
+    _lastRelativeTempEvolution = _relativeTempEvolution;
     val1 = _vec[_vec.size() - period - 1];
     val2 = _vec.back();
-    _r = int (round((val2 - val1) /val1 * 100));
+    _relativeTempEvolution = int (round((val2 - val1) /val1 * 100));
 }
 
-void Groundhog::calculateStandarDeviation(int period)
+void Groundhog::calculateStandardDeviation(int period)
 {
     double val1 = 0;
     double val2 = 0;
@@ -58,16 +58,15 @@ void Groundhog::calculateStandarDeviation(int period)
         val1 += *i;
         val2 += (*i) * (*i);
     }
-    _s = sqrt(val2 / period - (val1 / period) * (val1 / period));
+    _standardDeviation = sqrt(val2 / period - (val1 / period) * (val1 / period));
 }
 
 void Groundhog::calculateWeirdest(void)
 {
     size_t i = _vec.size() - 1;
-    if (_s != 0 && fabs(_vec[i] - _vec[i - 1]) - 2*_s > 0) {
+    if (_standardDeviation != 0 && fabs(_vec[i] - _vec[i - 1]) - 2 * _standardDeviation > 0) {
         _weirdValues.push_back(_vec[i]);
     }
-    //TODO Get the missing val
 }
 
 void Groundhog::display(unsigned int period)
@@ -76,20 +75,20 @@ void Groundhog::display(unsigned int period)
     if (_vec.size() <= period)
         std::cout << "nan";
     else
-        std::cout <<_g;
+        std::cout << _tempIncreaseAverage;
 
     std::cout << "\tr=";
     if (_vec.size() <= period)
         std::cout << "nan";
     else
-        std::cout << std::fixed << std::setprecision(3) <<  _r;
+        std::cout << std::fixed << std::setprecision(3) <<  _relativeTempEvolution;
     std::cout << "%";
 
     std::cout <<"\ts=";
     if (_vec.size() < period)
         std::cout << "nan";
     else
-        std::cout << std::fixed << std::setprecision(2) << _s;
+        std::cout << std::fixed << std::setprecision(2) << _standardDeviation;
             int tendencyDown = 0;
             int tendencyUp = 0;
             if (_vec.size() == period) {
@@ -128,8 +127,8 @@ void Groundhog::core(int period)
             _vec.push_back(std::atof(_input));
             calculateWeirdest();
             calculateTemperatureIncreaseAverage(period);
-            calculateRelativeTempatureEvolution(period);
-            calculateStandarDeviation(period);
+            calculateRelativeTemperatureEvolution(period);
+            calculateStandardDeviation(period);
             display(period);
         }
         nbLine++;
